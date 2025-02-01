@@ -1,7 +1,364 @@
-cd path/to/your/project
-git init
-git add .
-git commit -m "Initial commit"
-git branch -M main
-git remote add origin https://github.com/YOUR-USERNAME/social-media-app.git
-git push -u origin main
+import { useState, useEffect } from 'react'
+import { Button } from "/components/ui/button"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "/components/ui/card"
+import { Input } from "/components/ui/input"
+import { Label } from "/components/ui/label"
+import { RadioGroup, RadioGroupItem } from "/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
+import { Heart, Shield, Clock, Users, Play, Home, Search, Menu, User, Settings, Mail, Bell, Calendar, Star, Upload, Download, Trash, Edit, Plus, Minus, Check, X, ArrowRight, MessageCircle, AlertTriangle } from "lucide-react"
+import { Avatar, AvatarFallback, AvatarImage } from "/components/ui/avatar"
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "/components/ui/dialog"
+
+export default function SocialMediaApp() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+  const [mediaFile, setMediaFile] = useState<File | null>(null)
+  const [description, setDescription] = useState('')
+  const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([])
+  const [isLiveStreaming, setIsLiveStreaming] = useState(false)
+  const [currentViewers, setCurrentViewers] = useState(0)
+  const [microphoneSource, setMicrophoneSource] = useState('default')
+  const [cameraSource, setCameraSource] = useState('default')
+  const [backgroundAudio, setBackgroundAudio] = useState(false)
+  const [textColor, setTextColor] = useState('black')
+  const [textSize, setTextSize] = useState('text-sm')
+  const [textLocation, setTextLocation] = useState('bottom-left')
+  const [viewerMessages, setViewerMessages] = useState<string[]>([])
+  const [newMessage, setNewMessage] = useState('')
+  const [platformCredentials, setPlatformCredentials] = useState<{ [key: string]: { username: string, password: string } }>({})
+
+  const handleLogin = () => {
+    setIsLoggedIn(true)
+  }
+
+  const handleLogout = () => {
+    setIsLoggedIn(false)
+  }
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setMediaFile(event.target.files[0])
+    }
+  }
+
+  const handleDescriptionChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setDescription(event.target.value)
+  }
+
+  const handlePlatformChange = (value: string) => {
+    setSelectedPlatforms((prev) => {
+      if (prev.includes(value)) {
+        return prev.filter((platform) => platform !== value)
+      } else {
+        return [...prev, value]
+      }
+    })
+  }
+
+  const handlePost = () => {
+    alert(`Posting to: ${selectedPlatforms.join(', ')}\nDescription: ${description}`)
+  }
+
+  const handleGoLive = () => {
+    setIsLiveStreaming(true)
+    alert('Live streaming started!')
+    // Simulate viewer count
+    const interval = setInterval(() => {
+      setCurrentViewers((prev) => prev + Math.floor(Math.random() * 5))
+    }, 5000)
+    return () => clearInterval(interval)
+  }
+
+  const handleEndLive = () => {
+    setIsLiveStreaming(false)
+    alert('Live streaming ended!')
+    setCurrentViewers(0)
+  }
+
+  const handleMicrophoneChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setMicrophoneSource(event.target.value)
+  }
+
+  const handleCameraChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setCameraSource(event.target.value)
+  }
+
+  const handleBackgroundAudioChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setBackgroundAudio(event.target.checked)
+  }
+
+  const handleTextColorChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextColor(event.target.value)
+  }
+
+  const handleTextSizeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextSize(event.target.value)
+  }
+
+  const handleTextLocationChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setTextLocation(event.target.value)
+  }
+
+  const handleSendMessage = () => {
+    if (newMessage.trim()) {
+      setViewerMessages((prev) => [...prev, newMessage])
+      setNewMessage('')
+    }
+  }
+
+  const handlePlatformLogin = (platform: string, username: string, password: string) => {
+    setPlatformCredentials((prev) => ({
+      ...prev,
+      [platform]: { username, password }
+    }))
+    alert(`Logged into ${platform} as ${username}`)
+  }
+
+  useEffect(() => {
+    // Simulate receiving messages from viewers
+    const interval = setInterval(() => {
+      const messages = [
+        "Hello!",
+        "This is awesome!",
+        "Can you see me?",
+        "Love the stream!",
+        "Keep it going!"
+      ]
+      const randomMessage = messages[Math.floor(Math.random() * messages.length)]
+      setViewerMessages((prev) => [...prev, randomMessage])
+    }, 15000) // Simulate every 15 seconds for better visibility
+    return () => clearInterval(interval)
+  }, [])
+
+  return (
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center p-4 relative">
+      <Card className="w-full max-w-3xl">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold">Da' Sonidero Experience</CardTitle>
+          <CardDescription>Upload, review, and post media to multiple platforms</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {!isLoggedIn ? (
+            <div className="flex flex-col items-center space-y-4">
+              <Button onClick={handleLogin} className="w-full">
+                <User className="mr-2 h-4 w-4" /> Login with Social Media
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="flex items-center space-x-4">
+                <Avatar>
+                  <AvatarImage src="https://github.com/nutlope.png" />
+                  <AvatarFallback>CN</AvatarFallback>
+                </Avatar>
+                <div>
+                  <p className="text-sm font-medium">John Doe</p>
+                  <p className="text-sm text-muted-foreground">johndoe@example.com</p>
+                </div>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="media-upload">Upload Media</Label>
+                <Input id="media-upload" type="file" onChange={handleFileChange} />
+              </div>
+              {mediaFile && (
+                <div className="flex items-center space-x-4">
+                  <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16" />
+                  <div>
+                    <p className="text-sm font-medium">{mediaFile.name}</p>
+                    <p className="text-sm text-muted-foreground">{mediaFile.type}</p>
+                  </div>
+                </div>
+              )}
+              <div className="flex flex-col space-y-2">
+                <Label htmlFor="description">Description</Label>
+                <Textarea id="description" value={description} onChange={handleDescriptionChange} />
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Label>Select Platforms</Label>
+                <div className="flex items-center space-x-2">
+                  <RadioGroup>
+                    <RadioGroupItem value="facebook" id="facebook" checked={selectedPlatforms.includes('facebook')} onCheckedChange={() => handlePlatformChange('facebook')} />
+                    <Label htmlFor="facebook">Facebook</Label>
+                  </RadioGroup>
+                  <RadioGroup>
+                    <RadioGroupItem value="twitter" id="twitter" checked={selectedPlatforms.includes('twitter')} onCheckedChange={() => handlePlatformChange('twitter')} />
+                    <Label htmlFor="twitter">Twitter</Label>
+                  </RadioGroup>
+                  <RadioGroup>
+                    <RadioGroupItem value="instagram" id="instagram" checked={selectedPlatforms.includes('instagram')} onCheckedChange={() => handlePlatformChange('instagram')} />
+                    <Label htmlFor="instagram">Instagram</Label>
+                  </RadioGroup>
+                </div>
+              </div>
+              <div className="flex flex-col space-y-2">
+                <Label>Platform Credentials</Label>
+                {selectedPlatforms.map((platform) => (
+                  <div key={platform} className="flex flex-col space-y-2">
+                    <Label>{platform.charAt(0).toUpperCase() + platform.slice(1)} Username</Label>
+                    <Input
+                      type="text"
+                      value={platformCredentials[platform]?.username || ''}
+                      onChange={(e) => handlePlatformLogin(platform, e.target.value, platformCredentials[platform]?.password || '')}
+                    />
+                    <Label>{platform.charAt(0).toUpperCase() + platform.slice(1)} Password</Label>
+                    <Input
+                      type="password"
+                      value={platformCredentials[platform]?.password || ''}
+                      onChange={(e) => handlePlatformLogin(platform, platformCredentials[platform]?.username || '', e.target.value)}
+                    />
+                  </div>
+                ))}
+              </div>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button className="w-full">
+                    <Upload className="mr-2 h-4 w-4" /> Post Media
+                  </Button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[425px]">
+                  <DialogHeader>
+                    <DialogTitle>Confirm Post</DialogTitle>
+                    <DialogDescription>
+                      <AlertTriangle className="mr-2 h-4 w-4 inline-block" /> By posting, you agree to follow all rules and restrictions given by each social media platform. Any and all uploads done by you are solely your responsibility. Da' Sonidero Experience at no time does any posted, streamed, or expressed content reflect the views of Da' Sonidero Experience.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <DialogFooter>
+                    <Button onClick={handlePost} className="w-full">
+                      Confirm Post
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+              {!isLiveStreaming ? (
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button className="w-full">
+                      <Play className="mr-2 h-4 w-4" /> Go Live
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-[425px]">
+                    <DialogHeader>
+                      <DialogTitle>Confirm Live Stream</DialogTitle>
+                      <DialogDescription>
+                        <AlertTriangle className="mr-2 h-4 w-4 inline-block" /> By going live, you agree to follow all rules and restrictions given by each social media platform. Any and all content streamed by you are solely your responsibility. Da' Sonidero Experience at no time does any posted, streamed, or expressed content reflect the views of Da' Sonidero Experience.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                      <Button onClick={handleGoLive} className="w-full">
+                        Confirm Go Live
+                      </Button>
+                    </DialogFooter>
+                  </DialogContent>
+                </Dialog>
+              ) : (
+                <div className="flex flex-col space-y-2">
+                  <Button onClick={handleEndLive} className="w-full">
+                    <X className="mr-2 h-4 w-4" /> End Live Stream
+                  </Button>
+                  <div className="flex items-center space-x-4">
+                    <Users className="h-4 w-4" />
+                    <p className="text-sm font-medium">{currentViewers} Current Viewers</p>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label>Microphone Source</Label>
+                    <Select value={microphoneSource} onValueChange={handleMicrophoneChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select microphone source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Device Default</SelectItem>
+                        <SelectItem value="external">External Microphone</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label>Camera Source</Label>
+                    <Select value={cameraSource} onValueChange={handleCameraChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select camera source" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="default">Device Default</SelectItem>
+                        <SelectItem value="external">External Camera</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="background-audio" className="text-sm font-medium">Play Background Audio</Label>
+                    <Input id="background-audio" type="checkbox" checked={backgroundAudio} onChange={handleBackgroundAudioChange} />
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label>Customize Text</Label>
+                    <Select value={textColor} onValueChange={handleTextColorChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select text color" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="black">Black</SelectItem>
+                        <SelectItem value="red">Red</SelectItem>
+                        <SelectItem value="blue">Blue</SelectItem>
+                        <SelectItem value="green">Green</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={textSize} onValueChange={handleTextSizeChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select text size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="text-sm">Small</SelectItem>
+                        <SelectItem value="text-base">Medium</SelectItem>
+                        <SelectItem value="text-lg">Large</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Select value={textLocation} onValueChange={handleTextLocationChange}>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select text location" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="top-left">Top Left</SelectItem>
+                        <SelectItem value="top-right">Top Right</SelectItem>
+                        <SelectItem value="bottom-left">Bottom Left</SelectItem>
+                        <SelectItem value="bottom-right">Bottom Right</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="flex flex-col space-y-2">
+                    <Label>Interact with Viewers</Label>
+                    <div className="border p-2 rounded">
+                      {viewerMessages.map((message, index) => (
+                        <div key={index} className="mb-2">
+                          <p className="text-sm">{message}</p>
+                        </div>
+                      ))}
+                    </div>
+                    <Textarea
+                      placeholder="Type a message to viewers..."
+                      value={newMessage}
+                      onChange={(e) => setNewMessage(e.target.value)}
+                      className="mt-2"
+                    />
+                    <Button className="w-full mt-2" onClick={handleSendMessage}>
+                      <MessageCircle className="mr-2 h-4 w-4" /> Send Message
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </CardContent>
+        <CardFooter>
+          {isLoggedIn && (
+            <Button variant="destructive" onClick={handleLogout} className="w-full">
+              <X className="mr-2 h-4 w-4" /> Logout
+            </Button>
+          )}
+        </CardFooter>
+      </Card>
+      {isLiveStreaming && (
+        <div className={`fixed ${textLocation} p-2 ${textSize} text-${textColor} bg-white bg-opacity-80 rounded z-50`}>
+          This live is provided by Da' Sonidero Experience
+        </div>
+      )}
+    </div>
+  )
+}
